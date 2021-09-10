@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package article.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+
+option go_package = "article/api/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.article.v1";
+option java_outer_classname = "ArticleProtoV1";
+
+// The article service definition.
+service Article {
+  // Create Article.
+  rpc CreateArticle(CreateArticleRequest) returns (CreateArticleReply) {
+    option (google.api.http) = {
+      post: "/article",
+      body: "*",
+    };
+  }
+
+  // Get An Article.
+  rpc GetArticle(GetArticleRequest) returns (GetArticleReply) {
+    option (google.api.http) = {
+      get: "/article/{article_id}",
+    };
+  }
+
+  // Update An article.
+  rpc UpdateArticle(UpdateArticleRequest) returns (UpdateArticleReply) {
+    option (google.api.http) = {
+      put: "/article/{article_id}",
+      body: "*",
+    };
+  }
+
+  // Delete An article.
+  rpc DeleteArticle(DeleteArticleRequest) returns (DeleteArticleReply) {
+    option (google.api.http) = {
+      delete: "/article/{article_id}",
+    };
+  }
+}
+
+// The article message.
+message ArticleMessage {
+  int64  id           = 1;
+  string title        = 2;
+  string author_name  = 3;
+  string content      = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+// The request message containing the article's title, author and context.
+message CreateArticleRequest {
+  string title        = 1;
+  string author_name  = 2;
+  string context      = 3;
+}
+
+// The response message containing the article's id.
+message CreateArticleReply {
+  int64 id = 1;
+}
+
+// The request message containing the article's id.
+message GetArticleRequest {
+  int64 article_id = 1;
+}
+
+message GetArticleReply {
+  ArticleMessage article = 1;
+}
+
+message UpdateArticleRequest {
+  int64   article_id        = 1;
+  ArticleMessage article    = 2;
+}
+
+message UpdateArticleReply {
+}
+
+message DeleteArticleRequest {
+  int64 article_id = 1;
+}
+
+message DeleteArticleReply {
+}

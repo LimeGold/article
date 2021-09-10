@@ -1,3 +1,4 @@
+//go:build wireinject
 // +build wireinject
 
 // The build tag makes sure the stub is not built in the final build.
@@ -5,11 +6,11 @@
 package main
 
 import (
-	"article/internal/biz"
-	"article/internal/conf"
-	"article/internal/data"
-	"article/internal/server"
-	"article/internal/service"
+	"github.com/LimeGold/article/internal/biz"
+	"github.com/LimeGold/article/internal/conf"
+	"github.com/LimeGold/article/internal/data"
+	"github.com/LimeGold/article/internal/server"
+	"github.com/LimeGold/article/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"

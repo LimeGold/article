@@ -34,3 +34,6 @@ bin/
 .vscode/
 .idea/
 *.swp
+
+# config
+configs/config.yaml
