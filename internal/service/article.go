@@ -3,6 +3,12 @@ package service
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
+	"gorm.io/gorm"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	pb "github.com/LimeGold/article/api/v1"
 	"github.com/LimeGold/article/internal/biz"
 	"github.com/go-kratos/kratos/v2/log"
@@ -23,12 +29,38 @@ func NewArticleService(uc *biz.ArticleUsecase, logger log.Logger) *ArticleServic
 
 // CreateArticle implements article.CreateArticle
 func (s *ArticleService) CreateArticle(ctx context.Context, req *pb.CreateArticleRequest) (*pb.CreateArticleReply, error) {
-	return &pb.CreateArticleReply{}, nil
+	id, err := s.uc.Create(ctx, &biz.Article{
+		Title:      req.Title,
+		Content:    req.Context,
+		AuthorName: req.AuthorName,
+	})
+
+	return &pb.CreateArticleReply{
+		Id: id,
+	}, err
 }
 
 // GetArticle implements article.GetArticle
 func (s *ArticleService) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*pb.GetArticleReply, error) {
-	return &pb.GetArticleReply{}, nil
+	article, err := s.uc.Get(ctx, req.GetArticleId())
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, pb.ErrorArticleNotFound("article id: %d", req.GetArticleId())
+		}
+		return nil, err
+	}
+
+	am := &pb.ArticleMessage{
+		Id:         int64(article.ID),
+		Title:      article.Title,
+		AuthorName: article.AuthorName,
+		Content:    article.Content,
+		CreatedAt:  timestamppb.New(article.CreatedAt),
+		UpdatedAt:  timestamppb.New(article.UpdatedAt),
+	}
+	return &pb.GetArticleReply{
+		Article: am,
+	}, nil
 }
 
 // UpdateArticle implements article.UpdateArticle
@@ -38,5 +70,6 @@ func (s *ArticleService) UpdateArticle(ctx context.Context, req *pb.UpdateArticl
 
 // DeleteArticle implements article.DeleteArticle
 func (s *ArticleService) DeleteArticle(ctx context.Context, req *pb.DeleteArticleRequest) (*pb.DeleteArticleReply, error) {
-	return &pb.DeleteArticleReply{}, nil
+	err := s.uc.Delete(ctx, req.ArticleId)
+	return &pb.DeleteArticleReply{}, err
 }
