@@ -14,7 +14,11 @@ type articleRepo struct {
 
 // NewArticleRepo .
 func NewArticleRepo(data *Data, logger log.Logger) biz.ArticleRepo {
-	data.db.AutoMigrate(&biz.Article{})
+	err := data.db.AutoMigrate(&biz.Article{})
+	if err != nil {
+		panic(err)
+	}
+
 	return &articleRepo{
 		data: data,
 		log:  log.NewHelper(logger),
@@ -32,7 +36,14 @@ func (r *articleRepo) GetArticle(ctx context.Context, id int64) (*biz.Article, e
 	return &article, err
 }
 
-func (r *articleRepo) UpdateArticle(ctx context.Context, g *biz.Article) error {
+func (r *articleRepo) UpdateArticle(ctx context.Context, id int64, g *biz.Article) error {
+	var article biz.Article
+	err := r.data.db.WithContext(ctx).First(&article, "id = ?", id).Error
+	if err != nil {
+		return err
+	}
+
+	g.ID = uint(id)
 	return r.data.db.WithContext(ctx).Save(g).Error
 }
 

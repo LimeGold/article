@@ -65,7 +65,15 @@ func (s *ArticleService) GetArticle(ctx context.Context, req *pb.GetArticleReque
 
 // UpdateArticle implements article.UpdateArticle
 func (s *ArticleService) UpdateArticle(ctx context.Context, req *pb.UpdateArticleRequest) (*pb.UpdateArticleReply, error) {
-	return &pb.UpdateArticleReply{}, nil
+	err := s.uc.Update(ctx, req.ArticleId, &biz.Article{
+		Model: gorm.Model{
+			ID: uint(req.ArticleId),
+		},
+		Title:      req.Article.Title,
+		AuthorName: req.Article.AuthorName,
+		Content:    req.Article.Content,
+	})
+	return &pb.UpdateArticleReply{}, err
 }
 
 // DeleteArticle implements article.DeleteArticle
